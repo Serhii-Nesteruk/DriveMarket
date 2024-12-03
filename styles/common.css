@@ -1,0 +1,54 @@
+/* Загальні стилі для всіх сторінок */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+}
+
+.logo {
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.menu a {
+    margin: 0 10px;
+    color: white;
+}
+
+.auth-buttons a {
+    margin-left: 10px;
+    padding: 10px 15px;
+    background-color: #ff5722;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.auth-buttons a:hover {
+    background-color: #e64a19;
+}
+
+/* Footer */
+.footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    position: relative;
+    width: 100%;
+}
