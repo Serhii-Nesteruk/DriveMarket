@@ -3,6 +3,7 @@
         "firebase/php-jwt": "^6.10",
         "lcobucci/jwt": "^4.0",
         "google/apiclient": "^2.18",
-      "ext-pdo": "*"
+      "ext-pdo": "*",
+        "facebook/graph-sdk": "^5.1"
     }
 }

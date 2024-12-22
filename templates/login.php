@@ -35,6 +35,7 @@
             <button type="submit" class="auth-btn" name="login">Zaloguj się</button>
             <h2>Or login with:</h2>
             <a href="../handlers/login-handler.php?google-login=true" class="google-login-btn">Google</a>
+            <a href="../handlers/facebook-login-handler.php?facebook-login=true" class="facebook-login-btn">Facebook</a>
         </form>
     </section>
 

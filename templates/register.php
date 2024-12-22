@@ -25,6 +25,30 @@
     <!-- Register Section -->
     <section class="register">
         <h1>Zarejestruj się</h1>
+        <?php
+        if (isset($_GET['error'])) {
+            switch($_GET['error']) {
+                case 'email_exists':
+                    echo '<p class="error-message">Користувач з такою електронною поштою вже існує!</p>';
+                    break;
+                case 'empty_username':
+                    echo '<p class="error-message">Будь ласка, введіть ім\'я користувача!</p>';
+                    break;
+                case 'empty_email':
+                    echo '<p class="error-message">Будь ласка, введіть email!</p>';
+                    break;
+                case 'empty_password':
+                    echo '<p class="error-message">Будь ласка, введіть пароль!</p>';
+                    break;
+                case 'registration_failed':
+                    echo '<p class="error-message">Помилка реєстрації. Спробуйте ще раз.</p>';
+                    break;
+                case 'database_error':
+                    echo '<p class="error-message">Помилка бази даних. Спробуйте пізніше.</p>';
+                    break;
+            }
+        }
+        ?>
         <form action="#" method="POST">
             <label for="username">Nazwa użytkownika:</label>
             <input type="text" id="username" name="username" required>
