@@ -25,9 +25,14 @@
     <!-- Login Section -->
     <section class="login">
         <h1>Zaloguj się</h1>
+        <?php
+        if (isset($_GET['error'])) {
+            echo '<p class="error-message">' . htmlspecialchars($_GET['error']) . '</p>';
+        }
+        ?>
         <form action="#" method="POST">
-            <label for="username">Nazwa użytkownika:</label>
-            <input type="text" id="username" name="email" required>
+            <label for="username">Email:</label>
+            <input type="email" id="username" name="email" required>
 
             <label for="password">Hasło:</label>
             <input type="password" id="password" name="password" required>

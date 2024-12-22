@@ -11,6 +11,9 @@ if (isset($_POST["register"])) {
         $connect = new PDO("mysql:host={$config['db_host']};dbname={$config['db_name']}", $config['db_username'], $config['db_password']);
         $connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+        // Додаємо перевірку/створення таблиці
+        createUserTableIfNotExists($connect);
+
         // Validate input fields
         if (empty($_POST["username"])) {
             header("Location: ../templates/register.php?error=empty_username");
