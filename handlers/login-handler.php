@@ -98,9 +98,11 @@ if (isset($_POST["login"])) {
     createUserTableIfNotExists($connect);
 
     if (empty($_POST["email"])) {
-        $error = 'Please Enter Email Details';
+        header("Location: ../templates/login.php?error=empty_email");
+        exit();
     } elseif (empty($_POST["password"])) {
-        $error = 'Please Enter Password Details';
+        header("Location: ../templates/login.php?error=empty_password");
+        exit();
     } else {
         $query = "SELECT * FROM user WHERE user_email = ?";
         $statement = $connect->prepare($query);
@@ -134,10 +136,12 @@ if (isset($_POST["login"])) {
                 header('location:../index.html');
                 exit();
             } else {
-                $error = 'Wrong Password';
+                header("Location: ../templates/login.php?error=wrong_password");
+                exit();
             }
         } else {
-            $error = 'Wrong Email Address';
+            header("Location: ../templates/login.php?error=wrong_email");
+            exit();
         }
     }
 }

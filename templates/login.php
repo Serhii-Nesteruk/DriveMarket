@@ -25,11 +25,44 @@ require '../handlers/login-handler.php';
             <a href="#">Produkty</a>
             <a href="#">Kontakt</a>
         </nav>
+        <div class="auth-container">
+            <div class="auth-buttons">
+                <a href="login.php" class="auth-btn">Zaloguj się</a>
+                <a href="register.php" class="auth-btn">Zarejestruj się</a>
+            </div>
+            <div class="user-menu">
+                <div class="avatar-circle" onclick="toggleDropdown()">
+                    <span id="userInitials">A</span>
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="profile.php">Profil</a>
+                    <button onclick="logout()">Wyloguj</button>
+                </div>
+            </div>
+        </div>
     </header>
 
     <!-- Login Section -->
     <section class="login">
         <h1>Zaloguj się</h1>
+        <?php
+        if (isset($_GET['error'])) {
+            switch($_GET['error']) {
+                case 'empty_email':
+                    echo '<p class="error-message">Proszę wprowadzić adres e-mail!</p>';
+                    break;
+                case 'empty_password':
+                    echo '<p class="error-message">Proszę wprowadzić hasło!</p>';
+                    break;
+                case 'wrong_password':
+                    echo '<p class="error-message">Nieprawidłowe hasło!</p>';
+                    break;
+                case 'wrong_email':
+                    echo '<p class="error-message">Nieprawidłowy adres e-mail!</p>';
+                    break;
+            }
+        }
+        ?>
         <form action="#" method="POST">
             <label for="username">Nazwa użytkownika:</label>
             <input type="text" id="username" name="email" required>
