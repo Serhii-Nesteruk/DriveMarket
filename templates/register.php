@@ -1,5 +1,11 @@
 <?php
-    require '../handlers/register-handler.php';
+session_start();
+if (isset($_COOKIE['token'])) {
+    header('Location: ../index.html');
+    exit();
+}
+
+require '../handlers/register-handler.php';
 ?>
 
 <!DOCTYPE html>
@@ -67,5 +73,7 @@
     <footer class="footer">
         <p>&copy; 2024 DriveMarket. Wszystkie prawa zastrzeżone.</p>
     </footer>
+
+    <script src="../scripts/auth.js"></script>
 </body>
 </html>

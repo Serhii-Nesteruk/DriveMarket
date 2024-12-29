@@ -13,12 +13,23 @@
         <div class="logo">DriveMarket</div>
         <nav class="menu">
             <a href="#">Strona główna</a>
-            <a href="templates/posts.html">Produkty</a>
+            <a href="templates/posts.php">Produkty</a>
             <a href="#">Kontakt</a>
         </nav>
-        <div class="auth-buttons">
-            <a href="templates/login.php" class="auth-btn">Zaloguj się</a>
-            <a href="templates/register.php" class="auth-btn">Zarejestruj się</a>
+        <div class="auth-container">
+            <div class="auth-buttons">
+                <a href="templates/login.php" class="auth-btn">Zaloguj się</a>
+                <a href="templates/register.php" class="auth-btn">Zarejestruj się</a>
+            </div>
+            <div class="user-menu">
+                <div class="avatar-circle" onclick="toggleDropdown()">
+                    <span id="userInitials">A</span>
+                </div>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a href="templates/profile.php">Profil</a>
+                    <button onclick="logout()">Wyloguj</button>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -52,6 +63,28 @@
     <footer class="footer">
         <p>&copy; 2024 DriveMarket. Wszystkie prawa zastrzeżone.</p>
     </footer>
+
+    <script src="scripts/auth.js"></script>
+    <script>
+    // Додаємо такий самий код, як в profile.php
+    document.addEventListener('DOMContentLoaded', async function() {
+        try {
+            const response = await fetch('handlers/get-user-data.php');
+            const userData = await response.json();
+            
+            if (userData.avatar_url) {
+                const headerAvatar = document.querySelector('.avatar-circle');
+                if (headerAvatar) {
+                    headerAvatar.innerHTML = `
+                        <img src="${userData.avatar_url}" 
+                             alt="User avatar"
+                             style="width: 100%; height: 100%; object-fit: cover;">`;
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+    </script>
 </body>
 </html>
-<?php?>

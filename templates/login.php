@@ -1,5 +1,10 @@
 <?php
-    require '../handlers/login-handler.php';
+session_start();
+if (isset($_COOKIE['token'])) {
+    header('Location: ../index.html');
+    exit();
+}
+require '../handlers/login-handler.php';
 ?>
 
 <!DOCTYPE html>
@@ -25,14 +30,9 @@
     <!-- Login Section -->
     <section class="login">
         <h1>Zaloguj się</h1>
-        <?php
-        if (isset($_GET['error'])) {
-            echo '<p class="error-message">' . htmlspecialchars($_GET['error']) . '</p>';
-        }
-        ?>
         <form action="#" method="POST">
-            <label for="username">Email:</label>
-            <input type="email" id="username" name="email" required>
+            <label for="username">Nazwa użytkownika:</label>
+            <input type="text" id="username" name="email" required>
 
             <label for="password">Hasło:</label>
             <input type="password" id="password" name="password" required>
@@ -48,5 +48,7 @@
     <footer class="footer">
         <p>&copy; 2024 DriveMarket. Wszystkie prawa zastrzeżone.</p>
     </footer>
+
+    <script src="../scripts/auth.js"></script>
 </body>
 </html>
