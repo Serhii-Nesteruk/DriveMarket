@@ -5,6 +5,7 @@
         "google/apiclient": "^2.18",
       "ext-pdo": "*",
         "facebook/graph-sdk": "^5.1",
-      "ext-json": "*"
+      "ext-json": "*",
+      "ext-fileinfo": "*"
     }
 }
