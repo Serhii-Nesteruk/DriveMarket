@@ -26,12 +26,14 @@ if (!isset($_COOKIE['token'])) {
                 <a href="login.php" class="auth-btn">Zaloguj się</a>
                 <a href="register.php" class="auth-btn">Zarejestruj się</a>
             </div>
-            <div class="user-menu" style="display: none;">
+            <div class="user-menu">
                 <div class="avatar-circle" onclick="toggleDropdown()">
                     <span id="userInitials">A</span>
                 </div>
                 <div class="dropdown-menu" id="dropdownMenu">
-                    <a href="profile.php">Mój profil</a>
+                    <a href="profile.php">Profil</a>
+                    <a href="create-listing.php">Dodaj ogłoszenie</a>
+                    <a href="my-listings.php">Moje ogłoszenia</a>
                     <button onclick="logout()">Wyloguj się</button>
                 </div>
             </div>

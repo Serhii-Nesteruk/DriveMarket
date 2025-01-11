@@ -4,7 +4,6 @@ if (isset($_COOKIE['token'])) {
     header('Location: ../index.html');
     exit();
 }
-require '../handlers/login-handler.php';
 ?>
 
 <!DOCTYPE html>
@@ -36,7 +35,9 @@ require '../handlers/login-handler.php';
                 </div>
                 <div class="dropdown-menu" id="dropdownMenu">
                     <a href="profile.php">Profil</a>
-                    <button onclick="logout()">Wyloguj</button>
+                    <a href="create-listing.php">Dodaj ogłoszenie</a>
+                    <a href="my-listings.php">Moje ogłoszenia</a>
+                    <button onclick="logout()">Wyloguj się</button>
                 </div>
             </div>
         </div>
@@ -63,9 +64,9 @@ require '../handlers/login-handler.php';
             }
         }
         ?>
-        <form action="#" method="POST">
-            <label for="username">Nazwa użytkownika:</label>
-            <input type="text" id="username" name="email" required>
+        <form action="../handlers/login-handler.php" method="POST">
+            <label for="username">E-mail:</label>
+            <input type="email" id="username" name="email" required>
 
             <label for="password">Hasło:</label>
             <input type="password" id="password" name="password" required>

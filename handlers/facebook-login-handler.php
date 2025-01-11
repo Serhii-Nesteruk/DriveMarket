@@ -2,6 +2,13 @@
 require "../vendor/autoload.php";
 $config = include('../config.php');
 
+createDatabaseIfNotExists($config['db_host'], $config['db_username'], $config['db_password'], $config['db_name']);
+
+$connect = new PDO("mysql:host={$config['db_host']};dbname={$config['db_name']}", $config['db_username'], $config['db_password']);
+$connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+createUserTableIfNotExists($connect);
+createListingsTableIfNotExists($connect);
+
 use Facebook\Facebook;
 use Facebook\Exceptions\FacebookResponseException;
 use Facebook\Exceptions\FacebookSDKException;
@@ -39,14 +46,6 @@ try {
             $user_email = $user->getEmail();
             $user_name = $user->getName();
             $avatar_url = $user['picture']['url'];
-
-            $connect = new PDO(
-                "mysql:host={$config['db_host']};dbname={$config['db_name']}", 
-                $config['db_username'], 
-                $config['db_password']
-            );
-            $connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            createUserTableIfNotExists($connect);
 
             $query = "SELECT * FROM user WHERE user_email = ?";
             $statement = $connect->prepare($query);

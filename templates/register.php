@@ -37,7 +37,9 @@ require '../handlers/register-handler.php';
                 </div>
                 <div class="dropdown-menu" id="dropdownMenu">
                     <a href="profile.php">Profil</a>
-                    <button onclick="logout()">Wyloguj</button>
+                    <a href="create-listing.php">Dodaj ogłoszenie</a>
+                    <a href="my-listings.php">Moje ogłoszenia</a>
+                    <button onclick="logout()">Wyloguj się</button>
                 </div>
             </div>
         </div>
