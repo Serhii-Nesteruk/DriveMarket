@@ -5,6 +5,13 @@ use Firebase\JWT\JWT;
 require '../vendor/autoload.php';
 $config = include('../config.php');
 
+createDatabaseIfNotExists($config['db_host'], $config['db_username'], $config['db_password'], $config['db_name']);
+
+$connect = new PDO("mysql:host={$config['db_host']};dbname={$config['db_name']}", $config['db_username'], $config['db_password']);
+$connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+createUserTableIfNotExists($connect);
+createListingsTableIfNotExists($connect);
+
 if (isset($_POST["register"])) {
     try {
         $connect = new PDO("mysql:host={$config['db_host']};dbname={$config['db_name']}", $config['db_username'], $config['db_password']);
