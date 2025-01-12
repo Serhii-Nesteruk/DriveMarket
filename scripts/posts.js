@@ -166,23 +166,19 @@ document.addEventListener('DOMContentLoaded', async function() {
             try {
                 const images = JSON.parse(listing.images);
                 if (images && images.length > 0) {
-                    const firstImage = images[0];
-                    if (firstImage.data && firstImage.type) {
-                        const img = document.createElement('img');
-                        img.src = `data:${firstImage.type};base64,${firstImage.data}`;
-                        img.alt = 'Zdjęcie pojazdu';
-                        postBox.appendChild(img);
-                    } else {
-                        postBox.innerHTML = '<div class="no-image">Brak zdjęcia</div>';
-                    }
+                    const img = document.createElement('img');
+                    img.src = '../' + images[0];
+                    img.alt = 'Zdjęcie pojazdu';
+                    postBox.appendChild(img);
                 } else {
-                    postBox.innerHTML = '<div class="no-image">Brak zdjęcia</div>';
+                    postBox.innerHTML = '';
                 }
             } catch (e) {
-                postBox.innerHTML = '<div class="no-image">Brak zdjęcia</div>';
+                console.error('Error parsing images:', e);
+                postBox.innerHTML = '';
             }
         } else {
-            postBox.innerHTML = '<div class="no-image">Brak zdjęcia</div>';
+            postBox.innerHTML = '';
         }
 
         postDiv.appendChild(postBox);

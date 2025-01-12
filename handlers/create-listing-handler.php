@@ -38,6 +38,15 @@ try {
         $config['db_password'],
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
+    
+    // Alter the images column to be MEDIUMTEXT
+    try {
+        $alterSql = "ALTER TABLE listings MODIFY COLUMN images MEDIUMTEXT";
+        $connect->exec($alterSql);
+        error_log("Successfully altered images column to MEDIUMTEXT");
+    } catch (PDOException $e) {
+        error_log("Failed to alter images column: " . $e->getMessage());
+    }
 } catch (PDOException $e) {
     die("Помилка підключення до БД: " . $e->getMessage());
 }
@@ -246,64 +255,97 @@ $systemy_wspomagania = categorizeEquipment($allEquipment, $systemyWspomaganiaLis
 $osiagi_tuning = categorizeEquipment($allEquipment, $osiagiTuningList);
 $bezpieczenstwo = categorizeEquipment($allEquipment, $bezpieczenstwoList);
 
-// Обробка зображень
-$images = [];
+// Функція для обробки завантаження зображень
+function handleImageUploads($files) {
+    error_log("Starting handleImageUploads function");
+    error_log("Files array: " . print_r($files, true));
+    
+    $uploadedImages = [];
+    $targetDir = dirname(__DIR__) . "/images/listings/";
+    
+    // Перевірка чи існує директорія, якщо ні - створюємо
+    if (!file_exists($targetDir)) {
+        error_log("Creating directory: " . $targetDir);
+        mkdir($targetDir, 0777, true);
+    }
 
-// При редагуванні, спочатку зберігаємо існуючі зображення
-if ($isEditing && isset($_POST['existing_images']) && is_string($_POST['existing_images'])) {
-    $existingImages = json_decode($_POST['existing_images'], true);
-    if (is_array($existingImages)) {
-        foreach ($existingImages as $image) {
-            if (isset($image['id']) && isset($image['type']) && isset($image['data'])) {
-                $images[] = $image; // Додаємо існуючі зображення в тому ж порядку
+    if (!isset($files['photos']) || empty($files['photos']['tmp_name'][0])) {
+        error_log("No photos found in files array");
+        return $uploadedImages;
+    }
+
+    foreach ($files['photos']['tmp_name'] as $key => $tmp_name) {
+        error_log("Processing file: " . $files['photos']['name'][$key]);
+        error_log("Temp name: " . $tmp_name);
+        error_log("Upload error code: " . $files['photos']['error'][$key]);
+        
+        if ($files['photos']['error'][$key] === UPLOAD_ERR_OK) {
+            $fileName = uniqid() . '_' . basename($files['photos']['name'][$key]);
+            $targetFile = $targetDir . $fileName;
+            
+            error_log("Target file: " . $targetFile);
+            
+            // Перевіряємо, чи це дійсно зображення
+            $check = getimagesize($tmp_name);
+            if ($check !== false) {
+                error_log("File is an image - " . $check["mime"]);
+                
+                // Перевіряємо розмір файлу (максимум 5MB)
+                if ($files['photos']['size'][$key] <= 5000000) {
+                    if (move_uploaded_file($tmp_name, $targetFile)) {
+                        error_log("File successfully uploaded to: " . $targetFile);
+                        $uploadedImages[] = 'images/listings/' . $fileName;
+                    } else {
+                        error_log("Failed to move uploaded file. Error: " . error_get_last()['message']);
+                        error_log("Current permissions on target dir: " . substr(sprintf('%o', fileperms($targetDir)), -4));
+                        error_log("Current user: " . get_current_user());
+                        error_log("PHP process user: " . posix_getpwuid(posix_geteuid())['name']);
+                    }
+                } else {
+                    error_log("File too large: " . $files['photos']['size'][$key]);
+                }
+            } else {
+                error_log("File is not an image");
             }
+        } else {
+            error_log("Upload error occurred: " . $files['photos']['error'][$key]);
         }
+    }
+    
+    error_log("Uploaded images array: " . print_r($uploadedImages, true));
+    return $uploadedImages;
+}
+
+// Обробка завантажених зображень
+$images = [];
+error_log("REQUEST METHOD: " . $_SERVER['REQUEST_METHOD']);
+error_log("CONTENT TYPE: " . $_SERVER['CONTENT_TYPE']);
+error_log("POST array content: " . print_r($_POST, true));
+error_log("FILES array content: " . print_r($_FILES, true));
+
+if (isset($_FILES['photos']) && !empty($_FILES['photos']['name'][0])) {
+    error_log("Processing photos...");
+    error_log("Photos details:");
+    error_log("Name: " . print_r($_FILES['photos']['name'], true));
+    error_log("Type: " . print_r($_FILES['photos']['type'], true));
+    error_log("Temp Name: " . print_r($_FILES['photos']['tmp_name'], true));
+    error_log("Error: " . print_r($_FILES['photos']['error'], true));
+    error_log("Size: " . print_r($_FILES['photos']['size'], true));
+    
+    $images = handleImageUploads($_FILES);
+    error_log("Processed images: " . print_r($images, true));
+} else {
+    error_log("No photos found in request");
+    if (!isset($_FILES['photos'])) {
+        error_log("'photos' key not found in FILES array");
+    } else if (empty($_FILES['photos']['name'][0])) {
+        error_log("No file name in the first element");
     }
 }
 
-// Обробка нових зображень
-if (!empty($_FILES['photos']['name'][0])) {
-    $newImages = [];
-    foreach ($_FILES['photos']['tmp_name'] as $key => $tmpName) {
-        // Перевірка на помилки завантаження
-        if ($_FILES['photos']['error'][$key] !== UPLOAD_ERR_OK) {
-            continue;
-        }
-
-        // Перевірка типу файлу
-        $mimeType = $_FILES['photos']['type'][$key];
-        if (!in_array($mimeType, ['image/jpeg', 'image/png'])) {
-            continue;
-        }
-
-        // Перевірка розміру файлу (максимум 5MB)
-        if ($_FILES['photos']['size'][$key] > 5 * 1024 * 1024) {
-            continue;
-        }
-
-        // Читаємо файл і конвертуємо в base64
-        $imageData = file_get_contents($tmpName);
-        $base64Data = base64_encode($imageData);
-
-        // Додаємо нове зображення в масив нових зображень
-        $newImages[] = [
-            'id' => uniqid(),
-            'type' => $mimeType,
-            'data' => $base64Data
-        ];
-    }
-
-    // Видаляємо останнє зображення з нових
-    if (!empty($newImages)) {
-        array_pop($newImages);
-    }
-
-    // Додаємо оброблені нові зображення до існуючих
-    $images = array_merge($images, $newImages);
-}
-
-// Конвертуємо масив зображень в JSON для збереження в БД
-$imagesJson = json_encode($images);
+// Convert images array to JSON
+$images_json = json_encode($images, JSON_UNESCAPED_UNICODE);
+error_log("Final images_json: " . $images_json);
 
 // Додаємо обробку селектів комфорту та систем допомоги
 $klimatyzacja = !empty($_POST['klimatyzacja']) && $_POST['klimatyzacja'] !== 'none' ? $_POST['klimatyzacja'] : null;
@@ -485,7 +527,7 @@ $params = [
     ':seller_phone' => $seller_phone,
     ':seller_location' => $seller_location,
     ':kraj_pochodzenia' => $kraj_pochodzenia,
-    ':images' => $imagesJson,
+    ':images' => $images_json,
     ':price_type' => $price_type,
     ':price' => $price,
     ':currency' => $currency
@@ -493,10 +535,9 @@ $params = [
 
 if ($isEditing) {
     $params[':listing_id'] = $listing_id;
-    $params[':user_id'] = $user_id; // Додаємо user_id для умови WHERE
+    $params[':user_id'] = $user_id; 
 }
 
-// Логуємо фінальні значення перед збереженням
 error_log("Final values before save:");
 error_log("damaged: " . $params[':damaged']);
 error_log("imported: " . $params[':imported']);
