@@ -8,7 +8,7 @@ use Firebase\JWT\Key;
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type');
-
+<!-- Password change form will be injected here by JavaScript -->
 $rawData = file_get_contents('php://input');
 error_log('Raw request data: ' . $rawData);
 $data = json_decode($rawData, true);

@@ -1234,7 +1234,6 @@ select option:not([value=""]) {
     color: #999;
 }
 
-/* Submit button styles */
 #listingForm button[type="submit"] {
     display: block;
     width: 100%;
