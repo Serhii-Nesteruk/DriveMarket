@@ -137,8 +137,37 @@ try {
         }
     }
 
-    // Додаємо сортування
-    $query .= " ORDER BY listing_id DESC";
+    // Add sorting
+    if (isset($_GET['sort'])) {
+        switch ($_GET['sort']) {
+            case 'wyróżnione':
+                $query .= " ORDER BY is_featured DESC";
+                break;
+            case 'cena_asc':
+                $query .= " ORDER BY price ASC";
+                break;
+            case 'cena_desc':
+                $query .= " ORDER BY price DESC";
+                break;
+            case 'przebieg_asc':
+                $query .= " ORDER BY mileage ASC";
+                break;
+            case 'przebieg_desc':
+                $query .= " ORDER BY mileage DESC";
+                break;
+            case 'moc_asc':
+                $query .= " ORDER BY engine_power ASC";
+                break;
+            case 'moc_desc':
+                $query .= " ORDER BY engine_power DESC";
+                break;
+            default:
+                $query .= " ORDER BY listing_id DESC";
+                break;
+        }
+    } else {
+        $query .= " ORDER BY listing_id DESC";
+    }
 
     $stmt = $connect->prepare($query);
     $stmt->execute($params);

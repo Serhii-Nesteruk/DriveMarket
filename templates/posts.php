@@ -48,6 +48,16 @@ $config = include('../config.php');
     <div class="filters-container">
         <div class="filters-row">
             <div class="filter-group">
+                <select class="filter-select" id="sortowanie">
+                    <option value="">Sortuj</option>
+                    <option value="wyróżnione">Wyróżnione</option>
+                    <option value="cena_asc">Cena: od najniższej</option>
+                    <option value="cena_desc">Cena: od najwyższej</option>
+                    <option value="przebieg_asc">Najniższy przebieg</option>
+                    <option value="przebieg_desc">Najwyższy przebieg</option>
+                </select>
+            </div>
+            <div class="filter-group">
                 <select class="filter-select" id="marka">
                     <option value="">Marka pojazdu</option>
                     <?php

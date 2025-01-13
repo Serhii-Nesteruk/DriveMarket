@@ -85,40 +85,8 @@ session_start();
             </div>
 
             <div class="contact-form">
-                <?php
-                if (isset($_GET['success']) && $_GET['success'] === 'true') {
-                    echo '<div class="success-message">Twoja wiadomość została wysłana pomyślnie! Odpowiemy najszybciej jak to możliwe.</div>';
-                }
-
-                if (isset($_GET['error'])) {
-                    $errors = explode(',', $_GET['error']);
-                    echo '<div class="error-message">';
-                    foreach ($errors as $error) {
-                        switch ($error) {
-                            case 'name_required':
-                                echo 'Proszę podać imię i nazwisko.<br>';
-                                break;
-                            case 'email_required':
-                                echo 'Proszę podać adres email.<br>';
-                                break;
-                            case 'invalid_email':
-                                echo 'Proszę podać prawidłowy adres email.<br>';
-                                break;
-                            case 'subject_required':
-                                echo 'Proszę podać temat wiadomości.<br>';
-                                break;
-                            case 'message_required':
-                                echo 'Proszę wpisać treść wiadomości.<br>';
-                                break;
-                            case 'database_error':
-                                echo 'Wystąpił błąd podczas wysyłania wiadomości. Prosimy spróbować później.<br>';
-                                break;
-                        }
-                    }
-                    echo '</div>';
-                }
-                ?>
-                <form action="../handlers/contact-handler.php" method="POST">
+                <div id="formMessage" class="message" style="display: none;"></div>
+                <form id="contactForm" action="../handlers/contact-handler.php" method="POST">
                     <div class="form-group">
                         <label for="name">Imię i nazwisko</label>
                         <input type="text" id="name" name="name" required>
@@ -127,11 +95,6 @@ session_start();
                     <div class="form-group">
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="subject">Temat</label>
-                        <input type="text" id="subject" name="subject" required>
                     </div>
 
                     <div class="form-group">
@@ -197,5 +160,33 @@ session_start();
 
 
     <script src="../scripts/auth.js"></script>
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const messageDiv = document.getElementById('formMessage');
+            
+            fetch('../handlers/contact-handler.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                messageDiv.textContent = data;
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'message ' + (data.includes('pomyślnie') ? 'success-message' : 'error-message');
+                
+                if (data.includes('pomyślnie')) {
+                    this.reset();
+                }
+            })
+            .catch(error => {
+                messageDiv.textContent = 'Wystąpił błąd podczas wysyłania wiadomości. Spróbuj ponownie później.';
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'message error-message';
+            });
+        });
+    </script>
 </body>
 </html>

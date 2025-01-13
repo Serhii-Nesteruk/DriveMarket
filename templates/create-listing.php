@@ -51,6 +51,21 @@ if (isset($_GET['edit'])) {
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
     
+    <style>
+        .details-content,
+        .equipment-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .details-content.expanded,
+        .equipment-content.expanded {
+            max-height: 1000px; /* Або інше велике значення */
+        }
+
+    </style>
+
 </head>
 <body>
     <header class="header">
@@ -1718,113 +1733,35 @@ if (isset($_GET['edit'])) {
             if (formData.systemy_wspomagania) setEquipmentCheckboxes(formData.systemy_wspomagania);
             if (formData.osiagi_tuning) setEquipmentCheckboxes(formData.osiagi_tuning);
             if (formData.bezpieczenstwo) setEquipmentCheckboxes(formData.bezpieczenstwo);
-        });
-        <?php endif; ?>
-    </script>
-    <script>
-        <?php if ($isEditing && $listingData): ?>
-        document.addEventListener('DOMContentLoaded', function() {
-            const formData = <?php echo json_encode($listingData); ?>;
-            
-            // Заповнення простих полів
-            for (const [key, value] of Object.entries(formData)) {
-                const elements = document.querySelectorAll(`[name="${key}"]`);
-                if (!elements.length) continue;
 
-                elements.forEach(element => {
-                    if (element.type === 'radio') {
-                        // Для радіо-кнопок порівнюємо значення
-                        if ((value === 1 && element.value === 'tak') || 
-                            (value === 0 && element.value === 'nie')) {
-                            element.checked = true;
-                        }
-                    } else if (element.type === 'checkbox') {
-                        element.checked = value === '1' || value === true;
-                    } else if (element.tagName === 'SELECT') {
-                        if (value !== null && value !== '') {
-                            element.value = value;
-                        }
-                    } else if (element.type === 'number') {
-                        element.value = value || '';
-                    } else {
-                        element.value = value || '';
-                    }
-                });
-            }
-
-            // Заповнення дати першої реєстрації
-            if (formData.first_registration) {
-                const [year, month, day] = formData.first_registration.split('-');
-                document.getElementById('first_reg_date_year').value = year;
-                document.getElementById('first_reg_date_month').value = month.padStart(2, '0');
-                document.getElementById('first_reg_date_day').value = day.padStart(2, '0');
-            }
-
-            // Заповнення прапорця приховування реєстраційної інформації
-            const hideRegInfoCheckbox = document.querySelector('input[name="hide_reg_info"]');
-            if (hideRegInfoCheckbox) {
-                hideRegInfoCheckbox.checked = formData.hide_reg_info === '1' || formData.hide_reg_info === 1 || formData.hide_reg_info === true;
-            }
-
-            // Заповнення VIN
-            document.getElementById('vin').value = formData.vin;
-
-            // Заповнення пробігу
-            document.getElementById('mileage').value = formData.mileage;
-
-            // Заповнення реєстраційного номера
-            document.getElementById('reg_number').value = formData.reg_number;
-
-            // Оновлюємо лічильники
-            updateRequiredFieldsCounter();
-        });
-        <?php endif; ?>
-    </script>
-    <script>
-        // Функція для встановлення чекбоксів обладнання
-        function setEquipmentCheckboxes(data) {
-            if (!data) return;
-            
-            try {
-                const equipment = typeof data === 'string' ? JSON.parse(data) : data;
-                equipment.forEach(value => {
-                    const checkbox = document.querySelector(`input[name="equipment[]"][value="${value}"]`);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                    }
-                });
-            } catch (e) {
-                console.error('Error setting equipment:', e);
-            }
-        }
-
-        // Функція для оновлення лічильника
-        function updateEquipmentCounter(checkbox) {
-            const section = checkbox.closest('.equipment-item');
-            if (section) {
-                const counter = section.querySelector('.equipment-counter');
-                if (counter) {
-                    const checkedCount = section.querySelectorAll('input[type="checkbox"]:checked').length;
-                    const total = counter.textContent.split('/')[1];
-                    counter.textContent = `${checkedCount}/${total}`;
+            // Set price type button active state
+            if (formData.price_type) {
+                const priceTypeLabel = document.querySelector(`label[for="price_type_${formData.price_type}"]`);
+                if (priceTypeLabel) {
+                    priceTypeLabel.classList.add('active');
                 }
             }
-        }
-
-        // Встановлюємо значення при завантаженні сторінки
-        <?php if ($isEditing && $listingData): ?>
-        document.addEventListener('DOMContentLoaded', function() {
-            const formData = <?php echo json_encode($listingData); ?>;
-            
-            // Встановлюємо чекбокси для кожної категорії
-            if (formData.audio_multimedia) setEquipmentCheckboxes(formData.audio_multimedia);
-            if (formData.komfort) setEquipmentCheckboxes(formData.komfort);
-            if (formData.samochody_elektryczne) setEquipmentCheckboxes(formData.samochody_elektryczne);
-            if (formData.systemy_wspomagania) setEquipmentCheckboxes(formData.systemy_wspomagania);
-            if (formData.osiagi_tuning) setEquipmentCheckboxes(formData.osiagi_tuning);
-            if (formData.bezpieczenstwo) setEquipmentCheckboxes(formData.bezpieczenstwo);
         });
         <?php endif; ?>
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Price type button handling
+            const priceTypeLabels = document.querySelectorAll('label.price-type-btn');
+            const priceTypeRadios = document.querySelectorAll('input[name="price_type"]');
+            
+            priceTypeLabels.forEach((label) => {
+                label.addEventListener('click', function() {
+                    // Remove active class from all labels
+                    priceTypeLabels.forEach(lbl => lbl.classList.remove('active'));
+                    // Add active class to clicked label
+                    this.classList.add('active');
+                    // Find and check the corresponding radio button
+                    const radioId = this.getAttribute('for');
+                    document.getElementById(radioId).checked = true;
+                });
+            });
+        });
     </script>
     <script>
         // Initialize Quill editor
@@ -1846,6 +1783,89 @@ if (isset($_GET['edit'])) {
             description.value = quill.root.innerHTML;
             return true;
         };
+    </script>
+    <script>
+        <?php if ($isEditing && $listingData): ?>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formData = <?php echo json_encode($listingData); ?>;
+            
+            // Populate form fields
+            for (const [key, value] of Object.entries(formData)) {
+                if (!value || ['audio_multimedia', 'komfort', 'samochody_elektryczne', 
+                    'systemy_wspomagania', 'osiagi_tuning', 'bezpieczenstwo'].includes(key)) continue;
+
+                const elements = document.getElementsByName(key);
+                elements.forEach(element => {
+                    if (element.type === 'radio') {
+                        if (element.value === value.toString()) {
+                            element.checked = true;
+                            if (key === 'price_type') {
+                                const label = document.querySelector(`label[for="${element.id}"]`);
+                                if (label) label.classList.add('active');
+                            }
+                        }
+                    } else if (element.type === 'checkbox') {
+                        element.checked = value === '1' || value === true;
+                    } else if (!element.type.includes('file')) {
+                        element.value = value;
+                    }
+                });
+            }
+
+            // Handle Quill editor
+            if (formData.description) {
+                const quill = new Quill('#editor');
+                quill.root.innerHTML = formData.description;
+            }
+            
+            // Handle equipment checkboxes
+            if (formData.audio_multimedia) setEquipmentCheckboxes(formData.audio_multimedia);
+            if (formData.komfort) setEquipmentCheckboxes(formData.komfort);
+            if (formData.samochody_elektryczne) setEquipmentCheckboxes(formData.samochody_elektryczne);
+            if (formData.systemy_wspomagania) setEquipmentCheckboxes(formData.systemy_wspomagania);
+            if (formData.osiagi_tuning) setEquipmentCheckboxes(formData.osiagi_tuning);
+            if (formData.bezpieczenstwo) setEquipmentCheckboxes(formData.bezpieczenstwo);
+        });
+        <?php endif; ?>
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    // Отримуємо всі кнопки для розгортання
+    const expandButtons = document.querySelectorAll('.expand-btn');
+
+    // Додаємо обробник подій для кожної кнопки
+    expandButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            // Знаходимо найближчий контейнер з класом details-section
+            const detailsSection = button.closest('.details-section');
+            
+            if (detailsSection) {
+                // Знаходимо елемент з класом details-content всередині секції
+                const detailsContent = detailsSection.querySelector('.details-content');
+
+                if (detailsContent) {
+                    detailsContent.classList.toggle('expanded');
+                    const isExpanded = detailsContent.classList.contains('expanded');
+                    detailsContent.style.maxHeight = isExpanded ? detailsContent.scrollHeight + 'px' : null;
+                }
+            }
+
+            // Для equipment-section
+            const equipmentSection = button.closest('.equipment-section');
+            
+            if (equipmentSection) {
+                const equipmentContent = equipmentSection.querySelector('.equipment-content');
+
+                if (equipmentContent) {
+                    equipmentContent.classList.toggle('expanded');
+                    const isExpanded = equipmentContent.classList.contains('expanded');
+                    equipmentContent.style.maxHeight = isExpanded ? equipmentContent.scrollHeight + 'px' : null;
+                }
+            }
+        });
+    });
+});
+
     </script>
 </body>
 </html>

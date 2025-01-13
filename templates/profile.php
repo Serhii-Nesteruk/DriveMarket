@@ -145,7 +145,7 @@ if (!isset($_COOKIE['token'])) {
                     </h2>
                 </div>
                 <div class="password-section" id="passwordSection">
-                    <!-- Password change form will be injected here by JavaScript -->
+                    
                 </div>
             </div>
         </div>

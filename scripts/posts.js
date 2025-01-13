@@ -29,10 +29,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     const rokDoSelect = document.getElementById('rok_do');
     const przebiegOdInput = document.getElementById('przebieg_od');
     const przebiegDoInput = document.getElementById('przebieg_do');
+    const sortSelect = document.getElementById('sortowanie');
 
     modelSelect.disabled = true;
     generacjaSelect.disabled = true;
-
 
     const statusSection = document.getElementById('statusSection');
     const statusModal = document.getElementById('statusModal');
@@ -124,6 +124,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
         if (przebiegDoInput.value) {
             params.append('przebieg_do', przebiegDoInput.value);
+        }
+
+        // Додаємо параметр сортування
+        if (sortSelect.value) {
+            params.append('sort', sortSelect.value);
         }
 
         try {
@@ -415,4 +420,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Завантажуємо початковий список оголошень
     updateListings();
+
+    // Add event listener for sorting
+    sortSelect.addEventListener('change', function() {
+        updateListings();
+    });
 });
