@@ -50,7 +50,6 @@ $config = include('../config.php');
             <div class="filter-group">
                 <select class="filter-select" id="sortowanie">
                     <option value="">Sortuj</option>
-                    <option value="wyróżnione">Wyróżnione</option>
                     <option value="cena_asc">Cena: od najniższej</option>
                     <option value="cena_desc">Cena: od najwyższej</option>
                     <option value="przebieg_asc">Najniższy przebieg</option>

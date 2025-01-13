@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async function() {
     const menuAuthLinks = document.querySelector('.menu-auth-links');
 
-    // Check authentication status and update menu
+    // Sprawdź stan uwierzytelnienia i zaktualizuj menu
     function updateMenuVisibility() {
         const auth = checkAuth();
         if (!auth.isAuthenticated) {
@@ -11,9 +11,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // Initial check
+    // Wstępna kontrola
     updateMenuVisibility();
 
-    // Periodically check authentication status
+    // Okresowo sprawdzaj stan uwierzytelnienia
     setInterval(updateMenuVisibility, 30000);
 });

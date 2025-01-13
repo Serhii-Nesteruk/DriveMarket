@@ -12,11 +12,11 @@ try {
     );
     $connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Базовий запит
+    // Podstawowe zapytanie
     $query = "SELECT * FROM listings WHERE 1=1";
     $params = [];
 
-    // Додаємо фільтри, якщо вони є
+    // Dodaj filtry, jeśli są
     if (!empty($_GET['marka'])) {
         $query .= " AND brand = :brand";
         $params[':brand'] = $_GET['marka'];
@@ -37,28 +37,28 @@ try {
         $params[':body_type'] = $_GET['typ_nadwozia'];
     }
 
-    // Фільтр за типом палива
+    // Filtr według rodzaju paliwa
     if (!empty($_GET['rodzaj_paliwa'])) {
         $query .= " AND fuel_type = :fuel_type";
         $params[':fuel_type'] = $_GET['rodzaj_paliwa'];
     }
 
-    // Фільтр за країною походження
+    // Filtr według kraju pochodzenia
     if (!empty($_GET['kraj_pochodzenia'])) {
         $query .= " AND kraj_pochodzenia = :kraj_pochodzenia";
         $params[':kraj_pochodzenia'] = $_GET['kraj_pochodzenia'];
     }
 
-    // Фільтр за станом пошкодження
+    // Filtr według stanu uszkodzenia
     if (isset($_GET['damaged']) && $_GET['damaged'] !== '') {
         $query .= " AND damaged = :damaged";
         $params[':damaged'] = (int)$_GET['damaged'];
     }
 
-    // Фільтрація за ціною
+    // Filtracja według ceny
     if (!empty($_GET['cena_od'])) {
         $cenaOd = floatval($_GET['cena_od']);
-        // Для netto цін враховуємо ПДВ
+        // Dla cen netto uwzględniamy VAT
         $query .= " AND (
             (price_type = 'brutto' AND price >= :cena_od) OR 
             (price_type = 'netto' AND price * 1.23 >= :cena_od)
@@ -68,7 +68,7 @@ try {
 
     if (!empty($_GET['cena_do'])) {
         $cenaDo = floatval($_GET['cena_do']);
-        // Для netto цін враховуємо ПДВ
+        // Dla cen netto uwzględniamy VAT
         $query .= " AND (
             (price_type = 'brutto' AND price <= :cena_do) OR 
             (price_type = 'netto' AND price * 1.23 <= :cena_do)
@@ -76,7 +76,7 @@ try {
         $params[':cena_do'] = $cenaDo;
     }
 
-    // Фільтрація за роком виробництва
+    // Filtracja według roku produkcji
     if (!empty($_GET['rok_od'])) {
         $query .= " AND prod_year >= :rok_od";
         $params[':rok_od'] = intval($_GET['rok_od']);
@@ -87,13 +87,13 @@ try {
         $params[':rok_do'] = intval($_GET['rok_do']);
     }
 
-    // Фільтр за пробігом від
+    // Filtr według przebiegu od
     if (!empty($_GET['przebieg_od'])) {
         $query .= " AND mileage >= :przebieg_od";
         $params[':przebieg_od'] = $_GET['przebieg_od'];
     }
 
-    // Фільтр за пробігом до
+    // Filtr według przebiegu do
     if (!empty($_GET['przebieg_do'])) {
         $query .= " AND mileage <= :przebieg_do";
         $params[':przebieg_do'] = $_GET['przebieg_do'];
@@ -137,45 +137,59 @@ try {
         }
     }
 
-    // Add sorting
+    // Dodaj sortowanie na podstawie parametru 'sort'
     if (isset($_GET['sort'])) {
         switch ($_GET['sort']) {
             case 'wyróżnione':
+                // Sortuj według wyróżnionych malejąco
                 $query .= " ORDER BY is_featured DESC";
                 break;
             case 'cena_asc':
+                // Sortuj według ceny rosnąco
                 $query .= " ORDER BY price ASC";
                 break;
             case 'cena_desc':
+                // Sortuj według ceny malejąco
                 $query .= " ORDER BY price DESC";
                 break;
             case 'przebieg_asc':
+                // Sortuj według przebiegu rosnąco
                 $query .= " ORDER BY mileage ASC";
                 break;
             case 'przebieg_desc':
+                // Sortuj według przebiegu malejąco
                 $query .= " ORDER BY mileage DESC";
                 break;
             case 'moc_asc':
+                // Sortuj według mocy silnika rosnąco
                 $query .= " ORDER BY engine_power ASC";
                 break;
             case 'moc_desc':
+                // Sortuj według mocy silnika malejąco
                 $query .= " ORDER BY engine_power DESC";
                 break;
             default:
+                // Domyślne sortowanie po ID ogłoszenia malejąco
                 $query .= " ORDER BY listing_id DESC";
                 break;
         }
     } else {
+        // Domyślne sortowanie po ID ogłoszenia malejąco, jeśli brak parametru 'sort'
         $query .= " ORDER BY listing_id DESC";
     }
 
+    // Przygotowanie i wykonanie zapytania SQL
     $stmt = $connect->prepare($query);
     $stmt->execute($params);
+
+    // Pobierz wszystkie wyniki jako tablicę asocjacyjną
     $listings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Wyślij wyniki jako odpowiedź w formacie JSON
     echo json_encode($listings);
 
 } catch (Exception $e) {
+    // Obsługa błędów: ustaw kod odpowiedzi HTTP na 500 i zwróć błąd jako JSON
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }
